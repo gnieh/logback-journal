@@ -1,0 +1,10 @@
+<configuration>
+
+  <appender name="journal" class="org.gnieh.logback.SystemdJournalAppender">
+    
+  </appender>
+
+  <root level="debug">
+    <appender-ref ref="journal" />
+  </root>
+</configuration>
