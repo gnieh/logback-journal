@@ -15,12 +15,22 @@
  */
 package org.gnieh.logback;
 
+import org.slf4j.MDC;
+
+/**
+ * Some constants that can be used to log some specific data. These constants
+ * are used as keys in {@link MDC}.
+ * 
+ * @author Lucas Satabin
+ * 
+ */
 public class SystemdJournal {
 
     private SystemdJournal() {
         // cannot be instantiated
     }
 
+    /** The MESSAGE_ID used for messages logged in this thread */
     public static String MESSAGE_ID = "MESSAGE_ID";
 
 }
