@@ -34,6 +34,12 @@ publishMavenStyle := true
 
 publishArtifact in Test := false
 
+// do not happen the scala version
+crossPaths := false
+
+// exclude scala library, this is a pure java project
+autoScalaLibrary := false
+
 // The Nexus repo we're publishing to.
 publishTo <<= version { (v: String) =>
   val nexus = "https://oss.sonatype.org/"
