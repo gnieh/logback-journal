@@ -6,6 +6,7 @@ import java.util.Map;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.classic.spi.StackTraceElementProxy;
 import ch.qos.logback.core.AppenderBase;
 
 /**
@@ -17,6 +18,8 @@ import ch.qos.logback.core.AppenderBase;
 public class SystemdJournalAppender extends AppenderBase<ILoggingEvent> {
 
     boolean logLocation = true;
+
+    boolean logException = true;
 
     boolean logThreadName = true;
 
@@ -35,16 +38,26 @@ public class SystemdJournalAppender extends AppenderBase<ILoggingEvent> {
             messages.add(levelToInt(event.getLevel()));
 
             // the location information if any is available and it is enabled
-            if (logLocation && event.hasCallerData()) {
-                StackTraceElement[] callerData = event.getCallerData();
-                if (callerData.length > 0) {
+            if (logLocation && event.getThrowableProxy() != null) {
+                StackTraceElementProxy[] stack = event.getThrowableProxy()
+                        .getStackTraceElementProxyArray();
+                if (stack.length > 0) {
+                    StackTraceElement elt = stack[0].getStackTraceElement();
                     messages.add("CODE_FILE=%s");
-                    messages.add(callerData[0].getFileName());
+                    messages.add(elt.getFileName());
                     messages.add("CODE_LINE=%i");
-                    messages.add(callerData[0].getLineNumber());
+                    messages.add(elt.getLineNumber());
                     messages.add("CODE_FUNC=%s.%s");
-                    messages.add(callerData[0].getClassName());
-                    messages.add(callerData[0].getMethodName());
+                    messages.add(elt.getClassName());
+                    messages.add(elt.getMethodName());
+                    // if one wants to log the exception name and message, just
+                    // do it
+                    if (logException) {
+                        messages.add("EXN_NAME=%s");
+                        messages.add(event.getThrowableProxy().getClassName());
+                        messages.add("EXN_MESSAGE=%s");
+                        messages.add(event.getThrowableProxy().getMessage());
+                    }
                 }
             }
 
@@ -60,8 +73,6 @@ public class SystemdJournalAppender extends AppenderBase<ILoggingEvent> {
             }
             // the vararg list is null terminated
             messages.add(null);
-
-            System.out.println(messages);
 
             SystemdJournalLibrary journald = SystemdJournalLibrary.INSTANCE;
 
