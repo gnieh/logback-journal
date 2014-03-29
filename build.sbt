@@ -2,7 +2,7 @@ name := "logback-journal"
 
 organization := "org.gnieh"
 
-version := "0.0.1-SNAPSHOT"
+version := "0.1.0-SNAPSHOT"
 
 licenses += ("The Apache Software License, Version 2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0.txt"))
 
@@ -22,7 +22,7 @@ resourceDirectories in Compile := List()
 OsgiKeys.exportPackage := Seq("org.gnieh.logback")
 
 OsgiKeys.additionalHeaders := Map (
-  "Bundle-Name" -> "systemd journal appender for slf4j"
+  "Bundle-Name" -> "systemd journal appender for logback"
 )
 
 OsgiKeys.bundleSymbolicName := "org.gnieh.logback.journal"
