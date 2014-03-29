@@ -1,7 +1,9 @@
 <configuration>
 
   <appender name="journal" class="org.gnieh.logback.SystemdJournalAppender">
-    
+    <logLocation>false</logLocation>
+    <logException>false</logException>
+    <logThreadName>true</logThreadName>
   </appender>
 
   <root level="debug">

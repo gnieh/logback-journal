@@ -10,12 +10,15 @@ public class TestSimple {
 
     public static void main(String[] args) {
         MDC.put(SystemdJournal.MESSAGE_ID, "15bbd5156ff24b6ea41468b102598b04");
+        long start = System.currentTimeMillis();
         try {
             logger.info("toto");
             throw new Exception("Glups");
         } catch (Exception e) {
             logger.error("some error occurred", e);
         }
+        long end = System.currentTimeMillis();
+        System.out.println("Execution time: " + (end - start) + "ms");
     }
 
 }

@@ -52,19 +52,24 @@ public class SystemdJournalAppender extends AppenderBase<ILoggingEvent> {
             messages.add("PRIORITY=%i");
             messages.add(levelToInt(event.getLevel()));
 
-            // the location information if any is available and it is enabled
-            if (logLocation && event.getThrowableProxy() != null) {
+            if (event.getThrowableProxy() != null) {
                 StackTraceElementProxy[] stack = event.getThrowableProxy()
                         .getStackTraceElementProxyArray();
                 if (stack.length > 0) {
-                    StackTraceElement elt = stack[0].getStackTraceElement();
-                    messages.add("CODE_FILE=%s");
-                    messages.add(elt.getFileName());
-                    messages.add("CODE_LINE=%i");
-                    messages.add(elt.getLineNumber());
-                    messages.add("CODE_FUNC=%s.%s");
-                    messages.add(elt.getClassName());
-                    messages.add(elt.getMethodName());
+
+                    // the location information if any is available and it is
+                    // enabled
+                    if (logLocation) {
+                        StackTraceElement elt = stack[0].getStackTraceElement();
+                        messages.add("CODE_FILE=%s");
+                        messages.add(elt.getFileName());
+                        messages.add("CODE_LINE=%i");
+                        messages.add(elt.getLineNumber());
+                        messages.add("CODE_FUNC=%s.%s");
+                        messages.add(elt.getClassName());
+                        messages.add(elt.getMethodName());
+                    }
+
                     // if one wants to log the exception name and message, just
                     // do it
                     if (logException) {
@@ -127,6 +132,14 @@ public class SystemdJournalAppender extends AppenderBase<ILoggingEvent> {
 
     public void setLogThreadName(boolean logThreadName) {
         this.logThreadName = logThreadName;
+    }
+
+    public boolean isLogException() {
+        return logException;
+    }
+
+    public void setLogException(boolean logException) {
+        this.logException = logException;
     }
 
 }
