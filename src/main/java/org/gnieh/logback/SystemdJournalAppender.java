@@ -97,6 +97,8 @@ public class SystemdJournalAppender extends AppenderBase<ILoggingEvent> {
             SystemdJournalLibrary journald = SystemdJournalLibrary.INSTANCE;
 
             journald.sd_journal_send("MESSAGE=%s", messages.toArray());
+        } catch (UnsatisfiedLinkError e) {
+            System.out.println(event.getLevel() + "> " + event.getFormattedMessage());
         } catch (NoClassDefFoundError e) {
             // not on a journald system, fall back to system.out
             System.out.println(event.getLevel() + "> " + event.getFormattedMessage());
