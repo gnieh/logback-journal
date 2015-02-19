@@ -87,9 +87,9 @@ public class SystemdJournalAppender extends AppenderBase<ILoggingEvent> {
                 messages.add(event.getThreadName());
             }
 
-            // add a message id field if any is defined for this logging event
-            if (mdc.containsKey(SystemdJournal.MESSAGE_ID)) {
-                messages.add("MESSAGE_ID=" + mdc.get(SystemdJournal.MESSAGE_ID));
+            // log all mdc fields.
+            for(String key : mdc.keySet()) {
+                messages.add(key + "=" + mdc.get(key));
             }
             // the vararg list is null terminated
             messages.add(null);
@@ -97,6 +97,9 @@ public class SystemdJournalAppender extends AppenderBase<ILoggingEvent> {
             SystemdJournalLibrary journald = SystemdJournalLibrary.INSTANCE;
 
             journald.sd_journal_send("MESSAGE=%s", messages.toArray());
+        } catch (NoClassDefFoundError e) {
+            // not on a journald system, fall back to system.out
+            System.out.println(event.getLevel() + "> " + event.getFormattedMessage());
         } catch (Exception e) {
             e.printStackTrace();
         }
