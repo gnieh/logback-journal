@@ -32,6 +32,8 @@ import ch.qos.logback.core.AppenderBase;
  */
 public class SystemdJournalAppender extends AppenderBase<ILoggingEvent> {
 
+    public static String LEVEL_OVERRIDE = "LEVEL_OVERRIDE";
+
     boolean logLocation = true;
 
     boolean logException = true;
@@ -50,7 +52,8 @@ public class SystemdJournalAppender extends AppenderBase<ILoggingEvent> {
 
             // the log level
             messages.add("PRIORITY=%i");
-            messages.add(levelToInt(event.getLevel()));
+            messages.add(levelToInt(event.getLevel(), mdc.get(LEVEL_OVERRIDE)));
+            mdc.remove(LEVEL_OVERRIDE);
 
             if (event.getThrowableProxy() != null) {
                 StackTraceElementProxy[] stack = event.getThrowableProxy()
@@ -107,7 +110,19 @@ public class SystemdJournalAppender extends AppenderBase<ILoggingEvent> {
         }
     }
 
-    private int levelToInt(Level l) {
+    private int levelToInt(Level l, String override) {
+        if("NOTICE".equals(override)) {
+            return 5;
+        }
+        if("CRITICAL".equals(override)) {
+            return 2;
+        }
+        if("ALERT".equals(override)) {
+            return 1;
+        }
+        if("EMERGENCY".equals(override)) {
+            return 0;
+        }
         switch (l.toInt()) {
         case Level.TRACE_INT:
         case Level.DEBUG_INT:
