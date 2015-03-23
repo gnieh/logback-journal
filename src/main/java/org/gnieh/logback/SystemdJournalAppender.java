@@ -71,6 +71,13 @@ public class SystemdJournalAppender extends AppenderBase<ILoggingEvent> {
                         messages.add("CODE_FUNC=%s.%s");
                         messages.add(elt.getClassName());
                         messages.add(elt.getMethodName());
+                        StringBuilder sb = new StringBuilder();
+                        for(StackTraceElementProxy trace : stack) {
+                            sb.append(trace.toString());
+                            sb.append("\n");
+                        }
+                        messages.add("STACKTRACE=%s");
+                        messages.add(sb.toString());
                     }
 
                     // if one wants to log the exception name and message, just
