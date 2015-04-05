@@ -9,3 +9,7 @@
 target/
 .project
 .classpath
+build
+.idea
+.gradle
+gradle.properties

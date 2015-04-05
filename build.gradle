@@ -1,0 +1,64 @@
+apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: 'git-repo'
+apply plugin: 'maven-publish'
+
+sourceCompatibility = 1.7
+apply from: 'version.gradle'
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath group: 'com.layer', name: 'gradle-git-repo-plugin', version: '2.0.0'
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile "net.java.dev.jna:jna:4.1.0"
+    compile "ch.qos.logback:logback-classic:1.1.1"
+}
+
+task sourceJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task testJar(type: Jar, dependsOn: classes) {
+    from sourceSets.test.output
+    exclude "**/*Test*"
+}
+
+gitPublishConfig{
+    org = project.hasProperty("org") ? project.property("org") : ""
+    repo = project.hasProperty("repo") ? project.property("repo") : ""
+    home = file(project.hasProperty("gitRepoHome") ? project.property("gitRepoHome") : "${System.properties['user.home']}/.gitRepos").path
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            groupId "org.gnieh"
+            artifactId 'logback-journald'
+            from components.java
+
+            artifact sourceJar {
+                classifier 'sources'
+            }
+
+            artifact testJar {
+                classifier 'test'
+            }
+        }
+    }
+    repositories {
+        maven {
+            url "file://${gitPublishConfig.home}/${gitPublishConfig.org}/${gitPublishConfig.repo}/releases"
+        }
+    }
+}
