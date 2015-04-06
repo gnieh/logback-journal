@@ -44,7 +44,7 @@ publishing {
     publications {
         mavenJava(MavenPublication) {
             groupId "org.gnieh"
-            artifactId 'logback-journald'
+            artifactId 'logback-journal'
             from components.java
 
             artifact sourceJar {

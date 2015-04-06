@@ -43,52 +43,77 @@ public class SystemdJournalAppender extends AppenderBase<ILoggingEvent> {
     @Override
     protected void append(ILoggingEvent event) {
         try {
+            StackTraceElementProxy[] stack = null;
+            String stackTrace = "";
+            String fileName = null;
+            Integer lineNumber = null;
+            String className = null;
+            String methodName = null;
+            String exnClass = null;
+            String exnMessage = null;
+            if (event.getThrowableProxy() != null) {
+                stack = event.getThrowableProxy()
+                        .getStackTraceElementProxyArray();
+                // if one wants to log the exception name and message, just
+                // do it
+                if (logException) {
+                    exnClass = event.getThrowableProxy().getClassName();
+                    exnMessage = event.getThrowableProxy().getMessage();
+                }
+                // the location information if any is available and it is
+                // enabled
+                if (stack.length > 0 && logLocation) {
+                    StringBuilder sb = new StringBuilder();
+                    sb.append(": ");
+                    if (exnClass != null) sb.append(exnClass);
+                    if (exnMessage != null) {
+                        sb.append("(");
+                        sb.append(exnMessage);
+                        sb.append(") ");
+                    }
+                    for(StackTraceElementProxy trace : stack) {
+                        sb.append(trace.toString());
+                        sb.append("; ");
+                    }
+                    stackTrace = sb.toString();
+                    StackTraceElement elt = stack[0].getStackTraceElement();
+                    fileName = elt.getFileName();
+                    lineNumber = elt.getLineNumber();
+                    className = elt.getClassName();
+                    methodName = elt.getMethodName();
+                }
+            }
             // get the message id if any
             Map<String, String> mdc = event.getMDCPropertyMap();
 
             List<Object> messages = new ArrayList<>();
             // the formatted human readable message
-            messages.add(event.getFormattedMessage());
+            messages.add(event.getFormattedMessage() + stackTrace);
 
             // the log level
             messages.add("PRIORITY=%i");
             messages.add(levelToInt(event.getLevel(), mdc.get(LEVEL_OVERRIDE)));
             mdc.remove(LEVEL_OVERRIDE);
-
-            if (event.getThrowableProxy() != null) {
-                StackTraceElementProxy[] stack = event.getThrowableProxy()
-                        .getStackTraceElementProxyArray();
-                if (stack.length > 0) {
-
-                    // the location information if any is available and it is
-                    // enabled
-                    if (logLocation) {
-                        StackTraceElement elt = stack[0].getStackTraceElement();
-                        messages.add("CODE_FILE=%s");
-                        messages.add(elt.getFileName());
-                        messages.add("CODE_LINE=%i");
-                        messages.add(elt.getLineNumber());
-                        messages.add("CODE_FUNC=%s.%s");
-                        messages.add(elt.getClassName());
-                        messages.add(elt.getMethodName());
-                        StringBuilder sb = new StringBuilder();
-                        for(StackTraceElementProxy trace : stack) {
-                            sb.append(trace.toString());
-                            sb.append("\n");
-                        }
-                        messages.add("STACKTRACE=%s");
-                        messages.add(sb.toString());
-                    }
-
-                    // if one wants to log the exception name and message, just
-                    // do it
-                    if (logException) {
-                        messages.add("EXN_NAME=%s");
-                        messages.add(event.getThrowableProxy().getClassName());
-                        messages.add("EXN_MESSAGE=%s");
-                        messages.add(event.getThrowableProxy().getMessage());
-                    }
-                }
+            if(fileName != null) {
+                messages.add("CODE_FILE=%s");
+                messages.add(fileName);
+            }
+            if(lineNumber != null) {
+                messages.add("CODE_LINE=%i");
+                messages.add(lineNumber);
+            }
+            if(className != null && methodName != null) {
+                messages.add("CODE_FUNC=%s.%s");
+                messages.add(className);
+                messages.add(methodName);
+            }
+            if(exnClass != null) {
+                messages.add("EXN_NAME=%s");
+                messages.add(exnClass);
+            }
+            if(exnMessage != null) {
+                messages.add("EXN_MESSAGE=%s");
+                messages.add(exnMessage);
             }
 
             // log thread name if enabled
