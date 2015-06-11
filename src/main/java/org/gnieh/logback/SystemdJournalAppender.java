@@ -73,7 +73,7 @@ public class SystemdJournalAppender extends AppenderBase<ILoggingEvent> {
                     }
                     for(StackTraceElementProxy trace : stack) {
                         sb.append(trace.toString());
-                        sb.append("; ");
+                        sb.append("\n ");
                     }
                     stackTrace = sb.toString();
                     StackTraceElement elt = stack[0].getStackTraceElement();
@@ -93,6 +93,8 @@ public class SystemdJournalAppender extends AppenderBase<ILoggingEvent> {
             // the log level
             messages.add("PRIORITY=%i");
             messages.add(levelToInt(event.getLevel(), mdc.get(LEVEL_OVERRIDE)));
+            messages.add("SYSLOG_FACILITY=%i");
+            messages.add(3);
             mdc.remove(LEVEL_OVERRIDE);
             if(fileName != null) {
                 messages.add("CODE_FILE=%s");
