@@ -1,4 +1,12 @@
 #!/bin/bash
 
+#build up the version based on jenkins info
+SHORT_COMMIT=`echo $COMMIT | cut -c1-8`
+echo $SHORT_COMMIT
+touch postfix
+VERSION="1.0.$BUILD_NUMBER-$SHORT_COMMIT"`cat postfix`
+echo -n $VERSION > version
+echo "version = '$VERSION'" > version.gradle
+
 ssh-keyscan github.com >> /root/.ssh/known_hosts
-gradle build publishToGithub --stacktrace
+gradle build publishToGithub
