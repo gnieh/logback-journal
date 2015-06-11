@@ -1,3 +1,4 @@
 #!/bin/bash
 
+ssh-keyscan github.com >> /root/.ssh/known_hosts
 gradle publishToGithub
