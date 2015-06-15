@@ -12,4 +12,3 @@ target/
 build
 .idea
 .gradle
-gradle.properties
