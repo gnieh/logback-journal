@@ -34,6 +34,8 @@ public class SystemdJournalAppender extends AppenderBase<ILoggingEvent> {
 
     public static String LEVEL_OVERRIDE = "LEVEL_OVERRIDE";
 
+    private String service = System.getenv().getOrDefault("SERVICE", "unknown");
+
     boolean logLocation = true;
 
     boolean logException = true;
@@ -95,6 +97,8 @@ public class SystemdJournalAppender extends AppenderBase<ILoggingEvent> {
             messages.add(levelToInt(event.getLevel(), mdc.get(LEVEL_OVERRIDE)));
             messages.add("SYSLOG_FACILITY=%i");
             messages.add(3);
+            messages.add("SERVICE=%s");
+            messages.add(service);
             mdc.remove(LEVEL_OVERRIDE);
             if(fileName != null) {
                 messages.add("CODE_FILE=%s");
