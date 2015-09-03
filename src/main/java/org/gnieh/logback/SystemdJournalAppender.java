@@ -89,7 +89,8 @@ public class SystemdJournalAppender extends AppenderBase<ILoggingEvent> {
 
             // add a message id field if any is defined for this logging event
             if (mdc.containsKey(SystemdJournal.MESSAGE_ID)) {
-                messages.add("MESSAGE_ID=" + mdc.get(SystemdJournal.MESSAGE_ID));
+                messages.add("MESSAGE_ID=%s");
+                messages.add(mdc.get(SystemdJournal.MESSAGE_ID));
             }
             // the vararg list is null terminated
             messages.add(null);
