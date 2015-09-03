@@ -32,6 +32,10 @@ import ch.qos.logback.core.AppenderBase;
  */
 public class SystemdJournalAppender extends AppenderBase<ILoggingEvent> {
 
+    public static String LEVEL_OVERRIDE = "LEVEL_OVERRIDE";
+
+    private String service = System.getenv().getOrDefault("SERVICE", "unknown");
+
     boolean logLocation = true;
 
     boolean logException = true;
@@ -41,44 +45,81 @@ public class SystemdJournalAppender extends AppenderBase<ILoggingEvent> {
     @Override
     protected void append(ILoggingEvent event) {
         try {
+            StackTraceElementProxy[] stack = null;
+            String stackTrace = "";
+            String fileName = null;
+            Integer lineNumber = null;
+            String className = null;
+            String methodName = null;
+            String exnClass = null;
+            String exnMessage = null;
+            if (event.getThrowableProxy() != null) {
+                stack = event.getThrowableProxy()
+                        .getStackTraceElementProxyArray();
+                // if one wants to log the exception name and message, just
+                // do it
+                if (logException) {
+                    exnClass = event.getThrowableProxy().getClassName();
+                    exnMessage = event.getThrowableProxy().getMessage();
+                }
+                // the location information if any is available and it is
+                // enabled
+                if (stack.length > 0 && logLocation) {
+                    StringBuilder sb = new StringBuilder();
+                    sb.append(": ");
+                    if (exnClass != null) sb.append(exnClass);
+                    if (exnMessage != null) {
+                        sb.append("(");
+                        sb.append(exnMessage);
+                        sb.append(") ");
+                    }
+                    for(StackTraceElementProxy trace : stack) {
+                        sb.append(trace.toString());
+                        sb.append("\n ");
+                    }
+                    stackTrace = sb.toString();
+                    StackTraceElement elt = stack[0].getStackTraceElement();
+                    fileName = elt.getFileName();
+                    lineNumber = elt.getLineNumber();
+                    className = elt.getClassName();
+                    methodName = elt.getMethodName();
+                }
+            }
             // get the message id if any
             Map<String, String> mdc = event.getMDCPropertyMap();
 
             List<Object> messages = new ArrayList<>();
             // the formatted human readable message
-            messages.add(event.getFormattedMessage());
+            messages.add(event.getFormattedMessage() + stackTrace);
 
             // the log level
             messages.add("PRIORITY=%i");
-            messages.add(levelToInt(event.getLevel()));
-
-            if (event.getThrowableProxy() != null) {
-                StackTraceElementProxy[] stack = event.getThrowableProxy()
-                        .getStackTraceElementProxyArray();
-                if (stack.length > 0) {
-
-                    // the location information if any is available and it is
-                    // enabled
-                    if (logLocation) {
-                        StackTraceElement elt = stack[0].getStackTraceElement();
-                        messages.add("CODE_FILE=%s");
-                        messages.add(elt.getFileName());
-                        messages.add("CODE_LINE=%i");
-                        messages.add(elt.getLineNumber());
-                        messages.add("CODE_FUNC=%s.%s");
-                        messages.add(elt.getClassName());
-                        messages.add(elt.getMethodName());
-                    }
-
-                    // if one wants to log the exception name and message, just
-                    // do it
-                    if (logException) {
-                        messages.add("EXN_NAME=%s");
-                        messages.add(event.getThrowableProxy().getClassName());
-                        messages.add("EXN_MESSAGE=%s");
-                        messages.add(event.getThrowableProxy().getMessage());
-                    }
-                }
+            messages.add(levelToInt(event.getLevel(), mdc.get(LEVEL_OVERRIDE)));
+            messages.add("SYSLOG_FACILITY=%i");
+            messages.add(3);
+            messages.add("SERVICE=%s");
+            messages.add(service);
+            mdc.remove(LEVEL_OVERRIDE);
+            if(fileName != null) {
+                messages.add("CODE_FILE=%s");
+                messages.add(fileName);
+            }
+            if(lineNumber != null) {
+                messages.add("CODE_LINE=%i");
+                messages.add(lineNumber);
+            }
+            if(className != null && methodName != null) {
+                messages.add("CODE_FUNC=%s.%s");
+                messages.add(className);
+                messages.add(methodName);
+            }
+            if(exnClass != null) {
+                messages.add("EXN_NAME=%s");
+                messages.add(exnClass);
+            }
+            if(exnMessage != null) {
+                messages.add("EXN_MESSAGE=%s");
+                messages.add(exnMessage);
             }
 
             // log thread name if enabled
@@ -87,9 +128,10 @@ public class SystemdJournalAppender extends AppenderBase<ILoggingEvent> {
                 messages.add(event.getThreadName());
             }
 
-            // add a message id field if any is defined for this logging event
-            if (mdc.containsKey(SystemdJournal.MESSAGE_ID)) {
-                messages.add("MESSAGE_ID=" + mdc.get(SystemdJournal.MESSAGE_ID));
+            // log all mdc fields.
+            for(String key : mdc.keySet()) {
+                messages.add(key + "=%s");
+                messages.add(mdc.get(key));
             }
             // the vararg list is null terminated
             messages.add(null);
@@ -97,12 +139,29 @@ public class SystemdJournalAppender extends AppenderBase<ILoggingEvent> {
             SystemdJournalLibrary journald = SystemdJournalLibrary.INSTANCE;
 
             journald.sd_journal_send("MESSAGE=%s", messages.toArray());
+        } catch (UnsatisfiedLinkError e) {
+            System.out.println(event.getLevel() + "> " + event.getFormattedMessage());
+        } catch (NoClassDefFoundError e) {
+            // not on a journald system, fall back to system.out
+            System.out.println(event.getLevel() + "> " + event.getFormattedMessage());
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private int levelToInt(Level l) {
+    private int levelToInt(Level l, String override) {
+        if("NOTICE".equals(override)) {
+            return 5;
+        }
+        if("CRITICAL".equals(override)) {
+            return 2;
+        }
+        if("ALERT".equals(override)) {
+            return 1;
+        }
+        if("EMERGENCY".equals(override)) {
+            return 0;
+        }
         switch (l.toInt()) {
         case Level.TRACE_INT:
         case Level.DEBUG_INT:

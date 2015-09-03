@@ -9,3 +9,6 @@
 target/
 .project
 .classpath
+build
+.idea
+.gradle
