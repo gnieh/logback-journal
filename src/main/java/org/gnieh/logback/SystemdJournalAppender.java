@@ -130,7 +130,8 @@ public class SystemdJournalAppender extends AppenderBase<ILoggingEvent> {
 
             // log all mdc fields.
             for(String key : mdc.keySet()) {
-                messages.add(key + "=" + mdc.get(key));
+                messages.add(key + "=%s");
+                messages.add(mdc.get(key));
             }
             // the vararg list is null terminated
             messages.add(null);
