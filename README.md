@@ -37,9 +37,10 @@ Basic configuration to use the systemd journal appender looks like this:
 
 The appender can be configured with the following properties
 
-Property name   | Type    | Description | Default Value
---------------- | ------- | ----------- | -------------
-`logLocation`   | boolean | Determines whether the exception locations are logged when present. This data is logged in standard systemd journal fields `CODE_FILE`, `CODE_LINE` and `CODE_FUNC`. | `true`
-`logException`  | boolean | Determines whether the exception name and messages are logged. This data is logged in the user fields `EXN_NAME` and `EXN_MESSAGE`. | `true`
-`logThreadName` | boolean | Determines whether the thread name is logged. This data is logged in the user field `THREAD_NAME`. | `true`
+Property name      | Type    | Description | Default Value
+------------------ | ------- | ----------- | -------------
+`logLocation`      | boolean | Determines whether the exception locations are logged when present. This data is logged in standard systemd journal fields `CODE_FILE`, `CODE_LINE` and `CODE_FUNC`. | `true`
+`logException`     | boolean | Determines whether the exception name and messages are logged. This data is logged in the user fields `EXN_NAME` and `EXN_MESSAGE`. | `true`
+`logThreadName`    | boolean | Determines whether the thread name is logged. This data is logged in the user field `THREAD_NAME`. | `true`
+`syslogIdentifier` | String  | Overrides the syslog identifier string. This data is logged in the user field `SYSLOG_IDENTIFIER`. | The process name (i.e. "java")
 
