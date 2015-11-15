@@ -26,9 +26,9 @@ import ch.qos.logback.core.AppenderBase;
 
 /**
  * An appender that send the events to systemd journal
- * 
+ *
  * @author Lucas Satabin
- * 
+ *
  */
 public class SystemdJournalAppender extends AppenderBase<ILoggingEvent> {
 
@@ -37,6 +37,8 @@ public class SystemdJournalAppender extends AppenderBase<ILoggingEvent> {
     boolean logException = true;
 
     boolean logThreadName = true;
+
+    String syslogIdentifier = "";
 
     @Override
     protected void append(ILoggingEvent event) {
@@ -92,6 +94,13 @@ public class SystemdJournalAppender extends AppenderBase<ILoggingEvent> {
                 messages.add("MESSAGE_ID=%s");
                 messages.add(mdc.get(SystemdJournal.MESSAGE_ID));
             }
+
+            // override the syslog identifier string if set
+            if (!syslogIdentifier.isEmpty()) {
+                messages.add("SYSLOG_IDENTIFIER=%s");
+                messages.add(syslogIdentifier);
+            }
+
             // the vararg list is null terminated
             messages.add(null);
 
@@ -143,4 +152,11 @@ public class SystemdJournalAppender extends AppenderBase<ILoggingEvent> {
         this.logException = logException;
     }
 
+    public String getSyslogIdentifier() {
+        return syslogIdentifier;
+    }
+
+    public void setSyslogIdentifier(String syslogIdentifier) {
+        this.syslogIdentifier = syslogIdentifier;
+    }
 }
