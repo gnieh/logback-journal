@@ -15,6 +15,7 @@
  */
 package org.gnieh.logback;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +24,7 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.classic.spi.StackTraceElementProxy;
 import ch.qos.logback.core.AppenderBase;
+import ch.qos.logback.core.encoder.Encoder;
 
 /**
  * An appender that send the events to systemd journal
@@ -40,6 +42,8 @@ public class SystemdJournalAppender extends AppenderBase<ILoggingEvent> {
 
     String syslogIdentifier = "";
 
+    Encoder<ILoggingEvent> encoder = null;
+
     @Override
     protected void append(ILoggingEvent event) {
         try {
@@ -47,8 +51,17 @@ public class SystemdJournalAppender extends AppenderBase<ILoggingEvent> {
             Map<String, String> mdc = event.getMDCPropertyMap();
 
             List<Object> messages = new ArrayList<>();
+
             // the formatted human readable message
-            messages.add(event.getFormattedMessage());
+            if (encoder == null)
+                messages.add(event.getFormattedMessage());
+            else {
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                encoder.init(baos);
+                encoder.doEncode(event);
+                String message = baos.toString();
+                messages.add(message);
+            }
 
             // the log level
             messages.add("PRIORITY=%i");
@@ -158,5 +171,13 @@ public class SystemdJournalAppender extends AppenderBase<ILoggingEvent> {
 
     public void setSyslogIdentifier(String syslogIdentifier) {
         this.syslogIdentifier = syslogIdentifier;
+    }
+
+    public Encoder<ILoggingEvent> getEncoder() {
+        return encoder;
+    }
+
+    public void setEncoder(Encoder<ILoggingEvent> encoder) {
+        this.encoder = encoder;
     }
 }
