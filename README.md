@@ -11,13 +11,13 @@ This appender is published in sonatype maven repository. If you are using maven,
 <dependency>
   <groupId>org.gnieh</groupId>
   <artifactId>logback-journal</artifactId>
-  <version>0.1.0-SNAPSHOT</version>
+  <version>0.1.0</version>
 </dependency>
 ```
 
 if you are using sbt, add this to your `build.sbt`
 ```scala
-libraryDependencies += "org.gnieh" % "logback-journal" % "0.1.0-SNAPSHOT"
+libraryDependencies += "org.gnieh" % "logback-journal" % "0.1.0"
 ```
 
 Configuration
