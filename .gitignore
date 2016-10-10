@@ -7,5 +7,6 @@
 
 .settings/
 target/
+build/
 .project
 .classpath
