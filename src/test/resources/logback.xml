@@ -4,9 +4,27 @@
     <logLocation>false</logLocation>
     <logException>false</logException>
     <logThreadName>true</logThreadName>
+    <logLoggerName>true</logLoggerName>
+    <logMdc>true</logMdc>
+    <mdcKeyPrefix>MY_</mdcKeyPrefix>
+    <syslogIdentifier>logback-journal-test</syslogIdentifier>
   </appender>
 
-  <root level="debug">
+  <appender name="journal-with-source" class="org.gnieh.logback.SystemdJournalAppender">
+    <logSourceLocation>true</logSourceLocation>
+    <logThreadName>true</logThreadName>
+    <logLoggerName>true</logLoggerName>
+    <syslogIdentifier>logback-journal-test</syslogIdentifier>
+    <encoder>
+      <pattern>[%t] %-5p %c{40}:%L - %m%n</pattern>
+    </encoder>
+  </appender>
+
+  <logger name="log-with-source" level="INFO">
+    <appender-ref ref="journal-with-source" />
+  </logger>
+
+  <logger name="org.gnieh.logback" level="debug">
     <appender-ref ref="journal" />
-  </root>
+  </logger>
 </configuration>

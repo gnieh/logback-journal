@@ -14,6 +14,8 @@ libraryDependencies += "net.java.dev.jna" % "jna" % "4.1.0"
 
 libraryDependencies += "ch.qos.logback"  % "logback-classic" % "1.1.1"
 
+libraryDependencies += "com.novocode" % "junit-interface" % "0.11" % "test"
+
 // OSGi settings
 osgiSettings
 

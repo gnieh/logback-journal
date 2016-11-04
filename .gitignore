@@ -5,6 +5,8 @@
 *.war
 *.ear
 
+/.idea/
+
 .settings/
 target/
 .project

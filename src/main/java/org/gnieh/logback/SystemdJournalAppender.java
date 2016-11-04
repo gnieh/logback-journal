@@ -36,9 +36,17 @@ public class SystemdJournalAppender extends AppenderBase<ILoggingEvent> {
 
     boolean logLocation = true;
 
+    boolean logSourceLocation = false;
+
     boolean logException = true;
 
     boolean logThreadName = true;
+
+    boolean logLoggerName = false;
+
+    boolean logMdc = false;
+
+    String mdcKeyPrefix = "";
 
     String syslogIdentifier = "";
 
@@ -67,7 +75,7 @@ public class SystemdJournalAppender extends AppenderBase<ILoggingEvent> {
             messages.add("PRIORITY=%i");
             messages.add(levelToInt(event.getLevel()));
 
-            if (event.getThrowableProxy() != null) {
+            if (hasException(event)) {
                 StackTraceElementProxy[] stack = event.getThrowableProxy()
                         .getStackTraceElementProxyArray();
                 if (stack.length > 0) {
@@ -76,13 +84,7 @@ public class SystemdJournalAppender extends AppenderBase<ILoggingEvent> {
                     // enabled
                     if (logLocation) {
                         StackTraceElement elt = stack[0].getStackTraceElement();
-                        messages.add("CODE_FILE=%s");
-                        messages.add(elt.getFileName());
-                        messages.add("CODE_LINE=%i");
-                        messages.add(elt.getLineNumber());
-                        messages.add("CODE_FUNC=%s.%s");
-                        messages.add(elt.getClassName());
-                        messages.add(elt.getMethodName());
+                        appendLocation(messages, elt);
                     }
 
                     // if one wants to log the exception name and message, just
@@ -114,6 +116,29 @@ public class SystemdJournalAppender extends AppenderBase<ILoggingEvent> {
                 messages.add(syslogIdentifier);
             }
 
+            if (logLoggerName) {
+                messages.add("LOGGER_NAME=%s");
+                messages.add(event.getLoggerName());
+            }
+
+            if (logMdc) {
+                String normalizedKeyPrefix = normalizeKey(mdcKeyPrefix);
+                for (Map.Entry<String, String> entry : mdc.entrySet()) {
+                    String key = entry.getKey();
+                    if (key != null && !key.equals(SystemdJournal.MESSAGE_ID)) {
+                        messages.add(normalizedKeyPrefix + normalizeKey(key) + "=%s");
+                        messages.add(entry.getValue());
+                    }
+                }
+            }
+
+            if (logSourceLocation && !hasException(event)) {
+                StackTraceElement[] callerData = event.getCallerData();
+                if (callerData != null && callerData.length >= 1) {
+                    appendLocation(messages, callerData[0]);
+                }
+            }
+
             // the vararg list is null terminated
             messages.add(null);
 
@@ -123,6 +148,20 @@ public class SystemdJournalAppender extends AppenderBase<ILoggingEvent> {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private boolean hasException(ILoggingEvent event) {
+        return event.getThrowableProxy() != null;
+    }
+
+    private void appendLocation(List<Object> messages, StackTraceElement stackTraceElement) {
+        messages.add("CODE_FILE=%s");
+        messages.add(stackTraceElement.getFileName());
+        messages.add("CODE_LINE=%i");
+        messages.add(stackTraceElement.getLineNumber());
+        messages.add("CODE_FUNC=%s.%s");
+        messages.add(stackTraceElement.getClassName());
+        messages.add(stackTraceElement.getMethodName());
     }
 
     private int levelToInt(Level l) {
@@ -139,6 +178,10 @@ public class SystemdJournalAppender extends AppenderBase<ILoggingEvent> {
         default:
             throw new IllegalArgumentException("Unknown level value: " + l);
         }
+    }
+
+    private static String normalizeKey(String key) {
+        return key.toUpperCase().replaceAll("[^_A-Z0-9]", "_");
     }
 
     public boolean isLogLocation() {
@@ -179,5 +222,37 @@ public class SystemdJournalAppender extends AppenderBase<ILoggingEvent> {
 
     public void setEncoder(Encoder<ILoggingEvent> encoder) {
         this.encoder = encoder;
+    }
+
+    public void setLogMdc(boolean logMdc) {
+        this.logMdc = logMdc;
+    }
+
+    public boolean isLogMdc() {
+        return logMdc;
+    }
+
+    public void setMdcKeyPrefix(String mdcKeyPrefix) {
+        this.mdcKeyPrefix = mdcKeyPrefix;
+    }
+
+    public String getMdcKeyPrefix() {
+        return mdcKeyPrefix;
+    }
+
+    public void setLogLoggerName(boolean logLoggerName) {
+        this.logLoggerName = logLoggerName;
+    }
+
+    public boolean isLogLoggerName() {
+        return logLoggerName;
+    }
+
+    public void setLogSourceLocation(boolean logSourceLocation) {
+        this.logSourceLocation = logSourceLocation;
+    }
+
+    public boolean isLogSourceLocation() {
+        return logSourceLocation;
     }
 }
