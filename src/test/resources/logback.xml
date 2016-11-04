@@ -4,6 +4,7 @@
     <logLocation>false</logLocation>
     <logException>false</logException>
     <logThreadName>true</logThreadName>
+    <logLoggerName>true</logLoggerName>
     <logMdc>true</logMdc>
     <mdcKeyPrefix>MY_</mdcKeyPrefix>
     <syslogIdentifier>logback-journal-test</syslogIdentifier>

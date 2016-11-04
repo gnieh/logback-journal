@@ -40,6 +40,8 @@ public class SystemdJournalAppender extends AppenderBase<ILoggingEvent> {
 
     boolean logThreadName = true;
 
+    boolean logLoggerName = false;
+
     boolean logMdc = false;
 
     String mdcKeyPrefix = "";
@@ -116,6 +118,11 @@ public class SystemdJournalAppender extends AppenderBase<ILoggingEvent> {
             if (!syslogIdentifier.isEmpty()) {
                 messages.add("SYSLOG_IDENTIFIER=%s");
                 messages.add(syslogIdentifier);
+            }
+
+            if (logLoggerName) {
+                messages.add("LOGGER_NAME=%s");
+                messages.add(event.getLoggerName());
             }
 
             if (logMdc) {
@@ -214,5 +221,13 @@ public class SystemdJournalAppender extends AppenderBase<ILoggingEvent> {
 
     public String getMdcKeyPrefix() {
         return mdcKeyPrefix;
+    }
+
+    public void setLogLoggerName(boolean logLoggerName) {
+        this.logLoggerName = logLoggerName;
+    }
+
+    public boolean isLogLoggerName() {
+        return logLoggerName;
     }
 }
