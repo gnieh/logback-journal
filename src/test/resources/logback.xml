@@ -4,6 +4,7 @@
     <logLocation>false</logLocation>
     <logException>false</logException>
     <logThreadName>true</logThreadName>
+    <syslogIdentifier>logback-journal-test</syslogIdentifier>
   </appender>
 
   <root level="debug">
