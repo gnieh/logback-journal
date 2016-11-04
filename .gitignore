@@ -9,5 +9,7 @@
 
 .settings/
 target/
+build/
 .project
 .classpath
+/bin/
