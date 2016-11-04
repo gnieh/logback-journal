@@ -49,4 +49,14 @@ public class SystemdJournalAppenderTest {
         logger.info("boom");
     }
 
+    @Test
+    public void testWithCustomMdc() throws Exception {
+        MDC.put("some-key", "some value");
+        logger.info("some message");
+
+        MDC.put("special_key%s==", "value with special characters: %s %s %1$");
+        logger.info("some other message");
+    }
+
+
 }

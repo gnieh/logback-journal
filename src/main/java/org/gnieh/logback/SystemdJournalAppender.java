@@ -40,6 +40,10 @@ public class SystemdJournalAppender extends AppenderBase<ILoggingEvent> {
 
     boolean logThreadName = true;
 
+    boolean logMdc = false;
+
+    String mdcKeyPrefix = "";
+
     String syslogIdentifier = "";
 
     Encoder<ILoggingEvent> encoder = null;
@@ -114,6 +118,17 @@ public class SystemdJournalAppender extends AppenderBase<ILoggingEvent> {
                 messages.add(syslogIdentifier);
             }
 
+            if (logMdc) {
+                String normalizedKeyPrefix = normalizeKey(mdcKeyPrefix);
+                for (Map.Entry<String, String> entry : mdc.entrySet()) {
+                    String key = entry.getKey();
+                    if (key != null && !key.equals(SystemdJournal.MESSAGE_ID)) {
+                        messages.add(normalizedKeyPrefix + normalizeKey(key) + "=%s");
+                        messages.add(entry.getValue());
+                    }
+                }
+            }
+
             // the vararg list is null terminated
             messages.add(null);
 
@@ -139,6 +154,10 @@ public class SystemdJournalAppender extends AppenderBase<ILoggingEvent> {
         default:
             throw new IllegalArgumentException("Unknown level value: " + l);
         }
+    }
+
+    private static String normalizeKey(String key) {
+        return key.toUpperCase().replaceAll("[^_A-Z0-9]", "_");
     }
 
     public boolean isLogLocation() {
@@ -179,5 +198,21 @@ public class SystemdJournalAppender extends AppenderBase<ILoggingEvent> {
 
     public void setEncoder(Encoder<ILoggingEvent> encoder) {
         this.encoder = encoder;
+    }
+
+    public void setLogMdc(boolean logMdc) {
+        this.logMdc = logMdc;
+    }
+
+    public boolean isLogMdc() {
+        return logMdc;
+    }
+
+    public void setMdcKeyPrefix(String mdcKeyPrefix) {
+        this.mdcKeyPrefix = mdcKeyPrefix;
+    }
+
+    public String getMdcKeyPrefix() {
+        return mdcKeyPrefix;
     }
 }
