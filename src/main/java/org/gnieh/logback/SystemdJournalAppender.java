@@ -36,6 +36,8 @@ public class SystemdJournalAppender extends AppenderBase<ILoggingEvent> {
 
     boolean logLocation = true;
 
+    boolean logSourceLocation = false;
+
     boolean logException = true;
 
     boolean logThreadName = true;
@@ -73,7 +75,7 @@ public class SystemdJournalAppender extends AppenderBase<ILoggingEvent> {
             messages.add("PRIORITY=%i");
             messages.add(levelToInt(event.getLevel()));
 
-            if (event.getThrowableProxy() != null) {
+            if (hasException(event)) {
                 StackTraceElementProxy[] stack = event.getThrowableProxy()
                         .getStackTraceElementProxyArray();
                 if (stack.length > 0) {
@@ -82,13 +84,7 @@ public class SystemdJournalAppender extends AppenderBase<ILoggingEvent> {
                     // enabled
                     if (logLocation) {
                         StackTraceElement elt = stack[0].getStackTraceElement();
-                        messages.add("CODE_FILE=%s");
-                        messages.add(elt.getFileName());
-                        messages.add("CODE_LINE=%i");
-                        messages.add(elt.getLineNumber());
-                        messages.add("CODE_FUNC=%s.%s");
-                        messages.add(elt.getClassName());
-                        messages.add(elt.getMethodName());
+                        appendLocation(messages, elt);
                     }
 
                     // if one wants to log the exception name and message, just
@@ -136,6 +132,13 @@ public class SystemdJournalAppender extends AppenderBase<ILoggingEvent> {
                 }
             }
 
+            if (logSourceLocation && !hasException(event)) {
+                StackTraceElement[] callerData = event.getCallerData();
+                if (callerData != null && callerData.length >= 1) {
+                    appendLocation(messages, callerData[0]);
+                }
+            }
+
             // the vararg list is null terminated
             messages.add(null);
 
@@ -145,6 +148,20 @@ public class SystemdJournalAppender extends AppenderBase<ILoggingEvent> {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private boolean hasException(ILoggingEvent event) {
+        return event.getThrowableProxy() != null;
+    }
+
+    private void appendLocation(List<Object> messages, StackTraceElement stackTraceElement) {
+        messages.add("CODE_FILE=%s");
+        messages.add(stackTraceElement.getFileName());
+        messages.add("CODE_LINE=%i");
+        messages.add(stackTraceElement.getLineNumber());
+        messages.add("CODE_FUNC=%s.%s");
+        messages.add(stackTraceElement.getClassName());
+        messages.add(stackTraceElement.getMethodName());
     }
 
     private int levelToInt(Level l) {
@@ -229,5 +246,13 @@ public class SystemdJournalAppender extends AppenderBase<ILoggingEvent> {
 
     public boolean isLogLoggerName() {
         return logLoggerName;
+    }
+
+    public void setLogSourceLocation(boolean logSourceLocation) {
+        this.logSourceLocation = logSourceLocation;
+    }
+
+    public boolean isLogSourceLocation() {
+        return logSourceLocation;
     }
 }

@@ -39,7 +39,8 @@ The appender can be configured with the following properties
 
 Property name      | Type    | Description | Default Value
 ------------------ | ------- | ----------- | -------------
-`logLocation`      | boolean | Determines whether the exception locations are logged when present. This data is logged in standard systemd journal fields `CODE_FILE`, `CODE_LINE` and `CODE_FUNC`. | `true`
+`logLocation`      | boolean | Determines whether the **exception** locations are logged when present. This data is logged in standard systemd journal fields `CODE_FILE`, `CODE_LINE` and `CODE_FUNC`. | `true`
+`logSourceLocation`| boolean | Determines whether the **source** locations are logged when present. Note that there is a performance overhead when switched on. This data is logged in standard systemd journal fields `CODE_FILE`, `CODE_LINE` and `CODE_FUNC`. | `false`
 `logException`     | boolean | Determines whether the exception name and messages are logged. This data is logged in the user fields `EXN_NAME` and `EXN_MESSAGE`. | `true`
 `logThreadName`    | boolean | Determines whether the thread name is logged. This data is logged in the user field `THREAD_NAME`. | `true`
 `logLoggerName`    | boolean | Determines whether the logger name is logged. This data is logged in the user field `LOG4J_LOGGER`. | `false`

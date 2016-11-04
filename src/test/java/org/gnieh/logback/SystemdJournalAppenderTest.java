@@ -10,6 +10,8 @@ public class SystemdJournalAppenderTest {
 
     private static final Logger logger = LoggerFactory.getLogger(SystemdJournalAppenderTest.class);
 
+    private static final Logger logWithSource = LoggerFactory.getLogger("log-with-source");
+
     @After
     public void clearMdc() {
         MDC.clear();
@@ -56,6 +58,17 @@ public class SystemdJournalAppenderTest {
 
         MDC.put("special_key%s==", "value with special characters: %s %s %1$");
         logger.info("some other message");
+    }
+
+    @Test
+    public void testLogWithSource() throws Exception {
+        logWithSource.info("some message");
+    }
+
+    @Test
+    public void testLogWithSourceAndException() throws Exception {
+        Exception exception = new RuntimeException("some exception");
+        logWithSource.error("some exception", exception);
     }
 
 
