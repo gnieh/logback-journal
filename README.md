@@ -20,6 +20,9 @@ if you are using sbt, add this to your `build.sbt`
 libraryDependencies += "org.gnieh" % "logback-journal" % "0.1.0"
 ```
 
+You also need the systemd journal library installed on your system to log to it. For newest version of systemd, journal is integrated in the systemd base library. Older version had a separate library named `systemd-journal`.
+This appender use `systemd` as a library by default. You can change this by using the `systemd.library` JVM property (e.g. `-Dsystemd.library=systemd-journal`)
+
 Configuration
 -------------
 
