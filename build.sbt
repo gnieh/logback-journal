@@ -2,7 +2,7 @@ name := "logback-journal"
 
 organization := "org.gnieh"
 
-version := "0.2.0-SNAPSHOT"
+version := "0.2.0"
 
 licenses += ("The Apache Software License, Version 2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0.txt"))
 
@@ -10,9 +10,9 @@ homepage := Some(url("https://github.com/gnieh/logback-journal"))
 
 javaOptions += "-Djna.nosys=true"
 
-libraryDependencies += "net.java.dev.jna" % "jna" % "4.1.0"
+libraryDependencies += "net.java.dev.jna" % "jna" % "4.2.2"
 
-libraryDependencies += "ch.qos.logback"  % "logback-classic" % "1.1.1"
+libraryDependencies += "ch.qos.logback"  % "logback-classic" % "1.1.7"
 
 libraryDependencies += "com.novocode" % "junit-interface" % "0.11" % "test"
 
