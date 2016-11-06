@@ -1,3 +1,5 @@
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.gnieh/logback-journal/badge.svg)](http://maven-badges.herokuapp.com/maven-central/org.gnieh/logback-journal)
+
 logback-journal
 ===============
 
