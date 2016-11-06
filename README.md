@@ -1,3 +1,5 @@
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.gnieh/logback-journal/badge.svg)](http://maven-badges.herokuapp.com/maven-central/org.gnieh/logback-journal)
+
 logback-journal
 ===============
 
@@ -11,13 +13,13 @@ This appender is published in sonatype maven repository. If you are using maven,
 <dependency>
   <groupId>org.gnieh</groupId>
   <artifactId>logback-journal</artifactId>
-  <version>0.1.0</version>
+  <version>0.2.0</version>
 </dependency>
 ```
 
 if you are using sbt, add this to your `build.sbt`
 ```scala
-libraryDependencies += "org.gnieh" % "logback-journal" % "0.1.0"
+libraryDependencies += "org.gnieh" % "logback-journal" % "0.2.0"
 ```
 
 You also need the systemd journal library installed on your system to log to it. For newest version of systemd, journal is integrated in the systemd base library. Older version had a separate library named `systemd-journal`.
@@ -46,7 +48,7 @@ Property name      | Type    | Description | Default Value
 `logSourceLocation`| boolean | Determines whether the **source** locations are logged when present. Note that there is a performance overhead when switched on. This data is logged in standard systemd journal fields `CODE_FILE`, `CODE_LINE` and `CODE_FUNC`. | `false`
 `logException`     | boolean | Determines whether the exception name and messages are logged. This data is logged in the user fields `EXN_NAME` and `EXN_MESSAGE`. | `true`
 `logThreadName`    | boolean | Determines whether the thread name is logged. This data is logged in the user field `THREAD_NAME`. | `true`
-`logLoggerName`    | boolean | Determines whether the logger name is logged. This data is logged in the user field `LOG4J_LOGGER`. | `false`
+`logLoggerName`    | boolean | Determines whether the logger name is logged. This data is logged in the user field `LOGGER_NAME`. | `false`
 `logMdc`           | boolean | Determines whether the MDC content is logged. Each key/value pair is logged as user field with the `mdcKeyPrefix` prefix. | `false`
 `mdcKeyPrefix`     | String  | Determines how MDC keys should be prefixed when `logMdc` is set to true. Note that keys need to match the regex pattern `[A-Z0-9_]+` and are normalized otherwise. | `""`
 `syslogIdentifier` | String  | Overrides the syslog identifier string. This data is logged in the user field `SYSLOG_IDENTIFIER`. | The process name (i.e. "java")
