@@ -68,10 +68,7 @@ public class SystemdJournalAppender extends AppenderBase<ILoggingEvent> {
 			if (encoder == null)
 				messages.add(event.getFormattedMessage());
 			else {
-				ByteArrayOutputStream baos = new ByteArrayOutputStream();
-				encoder.init(baos);
-				encoder.doEncode(event);
-				String message = baos.toString();
+				String message = new String(encoder.encode(event));
 				messages.add(message);
 			}
 

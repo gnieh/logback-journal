@@ -10,9 +10,9 @@ homepage := Some(url("https://github.com/gnieh/logback-journal"))
 
 javaOptions += "-Djna.nosys=true"
 
-libraryDependencies += "net.java.dev.jna" % "jna" % "4.2.2"
+libraryDependencies += "net.java.dev.jna" % "jna" % "4.4.0"
 
-libraryDependencies += "ch.qos.logback"  % "logback-classic" % "1.1.7"
+libraryDependencies += "ch.qos.logback"  % "logback-classic" % "1.2.3"
 
 libraryDependencies += "com.novocode" % "junit-interface" % "0.11" % "test"
 
@@ -43,11 +43,11 @@ crossPaths := false
 autoScalaLibrary := false
 
 // The Nexus repo we're publishing to.
-publishTo <<= version { (v: String) =>
-  val nexus = "https://oss.sonatype.org/"
-    if (v.trim.endsWith("SNAPSHOT")) Some("snapshots" at nexus + "content/repositories/snapshots")
-    else Some("releases" at nexus + "service/local/staging/deploy/maven2")
-}
+publishTo := (version { (v: String) =>
+    val nexus = "https://oss.sonatype.org/"
+      if (v.trim.endsWith("SNAPSHOT")) Some("snapshots" at nexus + "content/repositories/snapshots")
+      else Some("releases" at nexus + "service/local/staging/deploy/maven2")
+  }).value
 
 pomIncludeRepository := { x => false }
 
