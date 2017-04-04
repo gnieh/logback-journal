@@ -2,7 +2,7 @@ name := "logback-journal"
 
 organization := "org.gnieh"
 
-version := "0.3.0-SNAPSHOT"
+version := "0.3.0"
 
 licenses += ("The Apache Software License, Version 2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0.txt"))
 

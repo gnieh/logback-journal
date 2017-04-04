@@ -13,13 +13,13 @@ This appender is published in sonatype maven repository. If you are using maven,
 <dependency>
   <groupId>org.gnieh</groupId>
   <artifactId>logback-journal</artifactId>
-  <version>0.2.0</version>
+  <version>0.3.0</version>
 </dependency>
 ```
 
 if you are using sbt, add this to your `build.sbt`
 ```scala
-libraryDependencies += "org.gnieh" % "logback-journal" % "0.2.0"
+libraryDependencies += "org.gnieh" % "logback-journal" % "0.3.0"
 ```
 
 You also need the systemd journal library installed on your system to log to it. For newest version of systemd, journal is integrated in the systemd base library. Older version had a separate library named `systemd-journal`.
