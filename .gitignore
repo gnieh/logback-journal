@@ -13,3 +13,4 @@ build/
 .project
 .classpath
 /bin/
+.DS_Store
