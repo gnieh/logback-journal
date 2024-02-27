@@ -108,9 +108,9 @@
             <version>1.3.12</version>
         </dependency>
         <dependency>
-            <groupId>com.novocode</groupId>
+            <groupId>com.github.sbt</groupId>
             <artifactId>junit-interface</artifactId>
-            <version>0.11</version>
+            <version>0.13.3</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
