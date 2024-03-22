@@ -1,3 +1,5 @@
+**This project is not maintained anymore due to lack of bandwidth to do so. If you have a well maintained fork, please reach out so that I can link to it.**
+
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.gnieh/logback-journal/badge.svg)](http://maven-badges.herokuapp.com/maven-central/org.gnieh/logback-journal)
 
 logback-journal
